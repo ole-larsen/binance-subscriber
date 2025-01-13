@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client Test</title>
+</head>
+<body>
+  <h1>WebSocket Client Test</h1>
+  <p>Status: <span id="status">Disconnected</span></p>
+  
+  <h2>Logs:</h2>
+  <div id="logs" style="border: 1px solid #ccc; padding: 10px; max-height: 200px; overflow-y: auto;"></div>
+
+  <script>
+    const serverUrl = "ws://localhost:8080/ws"; // Replace with your WebSocket server URL
+    const statusElement = document.getElementById("status");
+    const logsElement = document.getElementById("logs");
+
+    const socket = new WebSocket(serverUrl);
+
+    function updateStatus(text, color = "black") {
+      statusElement.textContent = text;
+      statusElement.style.color = color;
+    }
+
+    function logMessage(message) {
+      const logEntryId = "logEntry"; // ID for the log entry
+      let logEntry = document.getElementById(logEntryId);
+
+      if (!logEntry) {
+        logEntry = document.createElement("div");
+        logEntry.id = logEntryId;
+        logsElement.appendChild(logEntry);
+      }
+
+      logEntry.textContent = message;
+
+    }
+
+    socket.onopen = () => {
+      updateStatus("Connected", "green");
+      logMessage("WebSocket connection opened.");
+    };
+
+    socket.onmessage = (event) => {
+      logMessage("Message from server: " + event.data);
+      setTimeout(() => {
+        const message = "echo";
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(message);
+        } else {
+          logMessage("Cannot send message: WebSocket is not open.");
+        }
+      }, 1000)
+    };
+
+    socket.onclose = (event) => {
+      updateStatus("Disconnected", "red");
+      logMessage("WebSocket connection closed.");
+    };
+
+    socket.onerror = (error) => {
+      updateStatus("Error", "red");
+      logMessage("WebSocket error: " + error.message);
+    };
+
+  </script>
+</body>
+</html>
