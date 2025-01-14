@@ -71,7 +71,6 @@ func InternalServerErrorRequest(rw http.ResponseWriter, _ *http.Request) {
 // @Accept  json
 // @Produce json
 // @Router /ws [get]
-
 func WebSocketHandler(store storage.Storage) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if store == nil {
